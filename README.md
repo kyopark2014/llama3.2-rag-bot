@@ -679,7 +679,7 @@ def priority_search(query, relevant_docs, bedrock_embeddings):
 
 ![image](https://github.com/kyopark2014/llama3-rag-workshop/assets/52392004/bd740367-2d61-4d8c-9a16-6c436445a793)
 
-결과의 아래쪽을 보면, 아래와 같이 OpenSearch의 Vector/Keyward 검색을 통해 결과가 얻어졌음을 알수 있습니다. 
+결과의 아래쪽을 보면, 아래와 같이 OpenSearch의 Vector/Keyword 검색을 통해 결과가 얻어졌음을 알수 있습니다. 
 
 ![image](https://github.com/kyopark2014/llama3-rag-workshop/assets/52392004/5ab71703-a6a8-4dfd-b406-bfa719e58259)
 
