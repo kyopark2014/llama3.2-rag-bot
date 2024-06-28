@@ -702,12 +702,12 @@ def priority_search(query, relevant_docs, bedrock_embeddings):
 
 더이상 인프라를 사용하지 않는 경우에 아래처럼 모든 리소스를 삭제할 수 있습니다. 
 
-1) [API Gateway Console](https://ap-northeast-2.console.aws.amazon.com/apigateway/main/apis?region=ap-northeast-2)로 접속하여 "rest-api-for-llama3-70b-langchain", "ws-api-for-llama3-70b-langchain"을 삭제합니다.
+1) [API Gateway Console](https://us-west-2.console.aws.amazon.com/apigateway/main/apis?region=us-west-2)로 접속하여 "rest-api-for-llama3-70b-langchain", "ws-api-for-llama3-70b-langchain"을 삭제합니다.
 
-2) [Cloud9 console](https://ap-northeast-2.console.aws.amazon.com/cloud9control/home?region=ap-northeast-2#/)에 접속하여 아래의 명령어로 전체 삭제를 합니다.
+2) [Cloud9 console](https://us-west-2.console.aws.amazon.com/cloud9control/home?region=us-west-2#/)에 접속하여 아래의 명령어로 전체 삭제를 합니다.
 
 ```text
-cd ~/environment/llama3-70b-langchain/cdk-llama3-bedrock/ && cdk destroy --all
+cd ~/environment/llama3-rag-workshop/cdk-llama3-rag-workshop/ && cdk destroy --all
 ```
 
 
