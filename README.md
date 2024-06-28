@@ -1,4 +1,4 @@
-![image](https://github.com/kyopark2014/llama3-rag-workshop/assets/52392004/412796a5-3ed4-456e-bfd4-38c12a6abb53)# Llama3로 RAG를 구현하는 Workshop
+# Llama3로 RAG를 구현하는 Workshop
 
 Llama3를 이용해 RAG를 구현합니다. 전체적인 Architecture는 아래와 같습니다.
 
@@ -8,10 +8,9 @@ Llama3를 이용해 RAG를 구현합니다. 전체적인 Architecture는 아래�
 ## Architecture의 구현 
 
 
-### LangChain
+### LangChain을 이용한 Bedrock 설정
 
 LangChain의 [ChatBedrock](https://python.langchain.com/v0.2/docs/integrations/chat/bedrock/)로 API을 이용합니다.
-
 
 ```python
 boto3_bedrock = boto3.client(
