@@ -641,7 +641,7 @@ def priority_search(query, relevant_docs, bedrock_embeddings):
 
 ### CDK를 이용한 인프라 설치
 
-본 실습에서는 Seoul 리전 (ap-northeast-2)을 사용합니다. [인프라 설치](./deployment.md)에 따라 CDK로 인프라 설치를 진행합니다. 
+본 실습에서는 Oregon 리전 (us-west-2)을 사용합니다. [인프라 설치](./deployment.md)에 따라 CDK로 인프라 설치를 진행합니다. 
 
 ### 실행 결과
 
