@@ -647,34 +647,43 @@ def priority_search(query, relevant_docs, bedrock_embeddings):
 
 #### 기본 채팅
 
-메뉴에서 "General Conversation"을 선택하고 먼저 "나는 여행을 좋아해"라고 입력한 후에 "서울"이라고 입력합니다. 대화 이력을 활용하였기 때문에 "서울"이라는 질문에 서울 여행과 관련된 대화를 수행합니다. 
+메뉴에서 "General Conversation"을 선택하고 먼저 "나는 여행을 좋아해"라고 입력한 후에, 다시 아래처럼 "서울"이라고 입력합니다. 대화 이력을 활용하였기 때문에 "서울"이라는 질문에 서울 여행과 관련된 대화를 수행합니다.  Llama3는 아직 [multilingual을 공식적으로 지원하지 않고 있어](https://ai.meta.com/blog/meta-llama-3/), 일부 부족한 면이 있으나 어느정도 수준의 한국어를 지원하고 있습니다. 
 
 ![image](https://github.com/kyopark2014/llama3-rag-workshop/assets/52392004/0dd1034d-5166-4783-b37c-9728937ace63)
 
-채탱창이 열리면 "여행하고 싶다."라고 입력합니다. 아래와 같이 영향의 의미와 대표적인 관광지에 대한 정보를 보여줍니다.
 
-<img width="850" alt="image" src="https://github.com/kyopark2014/llama3-70b-langchain/assets/52392004/f29ffcb8-859a-4c71-8731-c977ff02bedd">
+브라우저에서 뒤로가기를 선택하여 아래와 같이 Conversation Type을 "4. Translation"로 선택합니다. 
 
-"경주"라고 입력하면, 이전 대화에서 여행에 대해 얘기했으므로, 경주의 여행정보를 아래와 같이 보여줍니다. Llama3는 아직 [multilingual을 공식적으로 지원하지 않고 있어](https://ai.meta.com/blog/meta-llama-3/), 일부 부족한 면이 있으나 어느정도 수준의 한국어를 지원하고 있습니다. 
+![image](https://github.com/kyopark2014/llama3-rag-workshop/assets/52392004/231916ba-b1e7-41ec-a8a1-dd832629b943)
 
-<img width="853" alt="image" src="https://github.com/kyopark2014/llama3-70b-langchain/assets/52392004/cd04eeee-420c-4d60-9976-5271e4ab3459">
+이후, "경주는 우리나라의 역사적인 도시입니다. 경주는 신라왕조의 수도였으며, 많은 문화유산을 가지고 있습니다. 경주에는 다양한 관광지가 있습니다. 불국사는 유네스코 세계문화유산으로 지정된 사찰입니다. 이 곳에는 많은 문화재가 있습니다. 둘째, 석굴암은 불국사와 함께 유네스코 세계문화유산으로 지정된 석굴입니다. 이 곳에는 많은 불상이 있습니다. 셋째, 경주歴史公園은 경주의 역사적인 문화유산을 느낄 수 있는 곳입니다. 이 곳에는 안압지, 첨성대, 황룡사지 등이 있습니다. 넷째, 양동마을은 전통한옥마을로 옛날의 모습을 그대로 간직하고 있습니다. 경주에는 역사적인 문화유산이 많아 역사에 관심이 있는 분들에게 추천합니다. 또한, 경주는 자연경관도 아름답습니다. 경주를 방문하여 다양한 경험을 하실 수 있습니다."라고 입력합니다. 이때의 번역 결과는 아래와 같습니다.
+
+![image](https://github.com/kyopark2014/llama3-rag-workshop/assets/52392004/f41fb398-b131-4c35-b9a6-02f504538a84)
+
+
+메뉴에서 "5. Grammatical Error Correction"을 선택합니다. 이후 "Gyeongju are a historic city in our country. It were the capital of the Silla Kingdom and have many cultural heritages."로 입력후 결과를 확인합니다. 아래와 같이 잘못된 문법과 수정된 내용을 보여줍니다.
+
+![image](https://github.com/kyopark2014/llama3-rag-workshop/assets/52392004/9b22c400-5776-4ed5-b1cb-c551338fe053)
+
+
+
+이제 RAG를 시험하기 위하여, 메뉴에서 아래처럼 "3. RAG-opensearch (hybrid)"을 선택합니다.
+
+![image](https://github.com/kyopark2014/llama3-rag-workshop/assets/52392004/b2daa766-a9f8-4b79-8077-a14c58e7f0f9)
 
 [error_code.pdf](./contents/error_code.pdf)을 다운로드 한 후에, 채팅창의 파일 아이콘을 선택하여 업로드를 하면 아래와 같이 파일 내용을 요약한 결과를 확인할 수 있습니다.
 
-<img width="856" alt="image" src="https://github.com/kyopark2014/llama3-70b-langchain/assets/52392004/3c3b3a9d-9da5-4810-b313-e2ade4754c9f">
+![image](https://github.com/kyopark2014/llama3-rag-workshop/assets/52392004/5974492a-d57b-4189-bd25-7fbf7fc5b243)
 
-브라우저에서 뒤로가기를 선택하여 아래와 같이 Conversation Type을 "2. Translation"로 선택합니다. 
+이제, 아래와 같이 "보일러 에러 코드에 대해 상세히 설명해줘."라고 입력한 후에 결과를 확인합니다.
 
-<img width="479" alt="image" src="https://github.com/kyopark2014/llama3-70b-langchain/assets/52392004/6a35985a-9c59-40bf-9352-289ff524edf2">
+![image](https://github.com/kyopark2014/llama3-rag-workshop/assets/52392004/bd740367-2d61-4d8c-9a16-6c436445a793)
 
-"경주는 우리나라의 역사적인 도시입니다. 경주는 신라왕조의 수도였으며, 많은 문화유산을 가지고 있습니다. 경주에는 다양한 관광지가 있습니다. 불국사는 유네스코 세계문화유산으로 지정된 사찰입니다. 이 곳에는 많은 문화재가 있습니다. 둘째, 석굴암은 불국사와 함께 유네스코 세계문화유산으로 지정된 석굴입니다. 이 곳에는 많은 불상이 있습니다. 셋째, 경주歴史公園은 경주의 역사적인 문화유산을 느낄 수 있는 곳입니다. 이 곳에는 안압지, 첨성대, 황룡사지 등이 있습니다. 넷째, 양동마을은 전통한옥마을로 옛날의 모습을 그대로 간직하고 있습니다. 경주에는 역사적인 문화유산이 많아 역사에 관심이 있는 분들에게 추천합니다. 또한, 경주는 자연경관도 아름답습니다. 경주를 방문하여 다양한 경험을 하실 수 있습니다."라고 입력합니다. 이때의 번역 결과는 아래와 같습니다.
+결과의 아래쪽을 보면, 아래와 같이 OpenSearch의 Vector/Keyward 검색을 통해 결과가 얻어졌음을 알수 있습니다. 
 
-<img width="854" alt="image" src="https://github.com/kyopark2014/llama3-70b-langchain/assets/52392004/ed26a74b-06c8-4f87-824f-96e0aeda07c6">
-
-다시 뒤로 가기를 선택하여, "3. Grammatical Error Correction"을 선택합니다. 이후 "Gyeongju are a historic city in our country. It were the capital of the Silla Kingdom and have many cultural heritages."로 입력후 결과를 확인합니다. 아래와 같이 잘못된 문법과 수정된 내용을 보여줍니다.
+![image](https://github.com/kyopark2014/llama3-rag-workshop/assets/52392004/5ab71703-a6a8-4dfd-b406-bfa719e58259)
 
 
-<img width="854" alt="image" src="https://github.com/kyopark2014/llama3-70b-langchain/assets/52392004/02cd4175-5f8d-41f6-870b-7fef0708ab87">
 
 ## 리소스 정리하기 
 
