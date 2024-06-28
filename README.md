@@ -623,4 +623,63 @@ def priority_search(query, relevant_docs, bedrock_embeddings):
 ```
 
 
+## 직접 실습 해보기
+
+### 사전 준비 사항
+
+이 솔루션을 사용하기 위해서는 사전에 아래와 같은 준비가 되어야 합니다.
+
+- [AWS Account 생성](https://repost.aws/ko/knowledge-center/create-and-activate-aws-account)
+
+### CDK를 이용한 인프라 설치
+
+본 실습에서는 Seoul 리전 (ap-northeast-2)을 사용합니다. [인프라 설치](./deployment.md)에 따라 CDK로 인프라 설치를 진행합니다. 
+
+### 실행 결과
+
+#### 기본 채팅
+
+메뉴에서 "General Conversation"을 선택하고 먼저 "나는 여행을 좋아해"라고 입력한 후에 "서울"이라고 입력합니다. 대화 이력을 활용하였기 때문에 "서울"이라는 질문에 서울 여행과 관련된 대화를 수행합니다. 
+
+![image](https://github.com/kyopark2014/llama3-rag-workshop/assets/52392004/0dd1034d-5166-4783-b37c-9728937ace63)
+
+채탱창이 열리면 "여행하고 싶다."라고 입력합니다. 아래와 같이 영향의 의미와 대표적인 관광지에 대한 정보를 보여줍니다.
+
+<img width="850" alt="image" src="https://github.com/kyopark2014/llama3-70b-langchain/assets/52392004/f29ffcb8-859a-4c71-8731-c977ff02bedd">
+
+"경주"라고 입력하면, 이전 대화에서 여행에 대해 얘기했으므로, 경주의 여행정보를 아래와 같이 보여줍니다. Llama3는 아직 [multilingual을 공식적으로 지원하지 않고 있어](https://ai.meta.com/blog/meta-llama-3/), 일부 부족한 면이 있으나 어느정도 수준의 한국어를 지원하고 있습니다. 
+
+<img width="853" alt="image" src="https://github.com/kyopark2014/llama3-70b-langchain/assets/52392004/cd04eeee-420c-4d60-9976-5271e4ab3459">
+
+[error_code.pdf](./contents/error_code.pdf)을 다운로드 한 후에, 채팅창의 파일 아이콘을 선택하여 업로드를 하면 아래와 같이 파일 내용을 요약한 결과를 확인할 수 있습니다.
+
+<img width="856" alt="image" src="https://github.com/kyopark2014/llama3-70b-langchain/assets/52392004/3c3b3a9d-9da5-4810-b313-e2ade4754c9f">
+
+브라우저에서 뒤로가기를 선택하여 아래와 같이 Conversation Type을 "2. Translation"로 선택합니다. 
+
+<img width="479" alt="image" src="https://github.com/kyopark2014/llama3-70b-langchain/assets/52392004/6a35985a-9c59-40bf-9352-289ff524edf2">
+
+"경주는 우리나라의 역사적인 도시입니다. 경주는 신라왕조의 수도였으며, 많은 문화유산을 가지고 있습니다. 경주에는 다양한 관광지가 있습니다. 불국사는 유네스코 세계문화유산으로 지정된 사찰입니다. 이 곳에는 많은 문화재가 있습니다. 둘째, 석굴암은 불국사와 함께 유네스코 세계문화유산으로 지정된 석굴입니다. 이 곳에는 많은 불상이 있습니다. 셋째, 경주歴史公園은 경주의 역사적인 문화유산을 느낄 수 있는 곳입니다. 이 곳에는 안압지, 첨성대, 황룡사지 등이 있습니다. 넷째, 양동마을은 전통한옥마을로 옛날의 모습을 그대로 간직하고 있습니다. 경주에는 역사적인 문화유산이 많아 역사에 관심이 있는 분들에게 추천합니다. 또한, 경주는 자연경관도 아름답습니다. 경주를 방문하여 다양한 경험을 하실 수 있습니다."라고 입력합니다. 이때의 번역 결과는 아래와 같습니다.
+
+<img width="854" alt="image" src="https://github.com/kyopark2014/llama3-70b-langchain/assets/52392004/ed26a74b-06c8-4f87-824f-96e0aeda07c6">
+
+다시 뒤로 가기를 선택하여, "3. Grammatical Error Correction"을 선택합니다. 이후 "Gyeongju are a historic city in our country. It were the capital of the Silla Kingdom and have many cultural heritages."로 입력후 결과를 확인합니다. 아래와 같이 잘못된 문법과 수정된 내용을 보여줍니다.
+
+
+<img width="854" alt="image" src="https://github.com/kyopark2014/llama3-70b-langchain/assets/52392004/02cd4175-5f8d-41f6-870b-7fef0708ab87">
+
+## 리소스 정리하기 
+
+더이상 인프라를 사용하지 않는 경우에 아래처럼 모든 리소스를 삭제할 수 있습니다. 
+
+1) [API Gateway Console](https://ap-northeast-2.console.aws.amazon.com/apigateway/main/apis?region=ap-northeast-2)로 접속하여 "rest-api-for-llama3-70b-langchain", "ws-api-for-llama3-70b-langchain"을 삭제합니다.
+
+2) [Cloud9 console](https://ap-northeast-2.console.aws.amazon.com/cloud9control/home?region=ap-northeast-2#/)에 접속하여 아래의 명령어로 전체 삭제를 합니다.
+
+```text
+cd ~/environment/llama3-70b-langchain/cdk-llama3-bedrock/ && cdk destroy --all
+```
+
+
+
 
