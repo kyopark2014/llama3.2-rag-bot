@@ -500,7 +500,6 @@ export class CdkLlama3RagWorkshopStack extends cdk.Stack {
         LLM_for_chat: JSON.stringify(llama3),          
         LLM_embedding: JSON.stringify(titan_embedding_v2),
         priorty_search_embedding: JSON.stringify(titan_embedding_v1),
-        googleApiSecret: googleApiSecret.secretName,
         projectName: projectName,
         separated_chat_history: separated_chat_history,
         enalbeParentDocumentRetrival: enalbeParentDocumentRetrival,
