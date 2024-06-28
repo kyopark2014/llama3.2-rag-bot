@@ -378,11 +378,11 @@ def get_summary(chat, docs):
     
     if isKorean(text)==True:
         system = (
-            "다음의 <article> tag안의 문장을 요약해서 500자 이내의 한국어로 설명하세오."
+            "다음의 <article> tag안의 문장을 요약해서 500자 이내의 한국어로 자세히 설명하세오."
         )
     else: 
         system = (
-            "Here is pieces of article, contained in <article> tags. Write a concise summary within 500 characters."
+            "Here is pieces of article, contained in <article> tags. Write a concise summary within 500 characters detaily."
         )
     
     human = "<article>{text}</article>"
