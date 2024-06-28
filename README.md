@@ -684,6 +684,19 @@ def priority_search(query, relevant_docs, bedrock_embeddings):
 ![image](https://github.com/kyopark2014/llama3-rag-workshop/assets/52392004/5ab71703-a6a8-4dfd-b406-bfa719e58259)
 
 
+[ReAct-SYNERGIZING REASONING AND ACTING IN LANGUAGE MODELS](https://arxiv.org/pdf/2210.03629)을 다운로드 한 후에 파일 아이콘을 선택하여 업로드하면 아래와 같이 요약 결과를 보여줍니다.
+
+![image](https://github.com/kyopark2014/llama3-rag-workshop/assets/52392004/3b1c92f7-80cd-41be-af25-c7c1a47b79f9)
+
+이제, "Tell me about KNOWLEDGE-INTENSIVE REASONING TASKS"을 입력하면 아래와 같이 간단히 설명해줍니다.
+
+![image](https://github.com/kyopark2014/llama3-rag-workshop/assets/52392004/bbcfa84a-86ff-4cdf-a298-59adbaed0207)
+
+좀더 자세히 알기 위하여, 아래처럼 추가 질문을 하면 상세한 정보를 얻을 수 있습니다.
+
+![image](https://github.com/kyopark2014/llama3-rag-workshop/assets/52392004/cc7eb464-a133-41e8-9e6d-a5c11467d022)
+
+
 
 ## 리소스 정리하기 
 
