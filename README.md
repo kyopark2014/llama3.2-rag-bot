@@ -1,17 +1,11 @@
-# llama3-rag-workshop
-It is a workshop of Llama3 using RAG.
+# Llama3로 RAG를 구현하는 Workshop
 
-
-전체적인 Architecture는 아래와 같습니다.
+Llama3를 이용해 RAG를 구현합니다. 전체적인 Architecture는 아래와 같습니다.
 
 <img src="./images/basic-architecture.png" width="800">
-   
 
-전체적인 Architecture는 아래와 같습니다.
 
-<img src="./images/basic-architecture.png" width="800">
-   
-## System Design
+## Architecture의 구현 
 
 ### LangChain
 
