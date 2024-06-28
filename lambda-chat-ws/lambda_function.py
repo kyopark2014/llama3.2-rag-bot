@@ -1439,7 +1439,7 @@ def getResponse(connectionId, jsonBody):
                 print('docs size: ', len(docs))
 
                 contexts = []
-                for doc in docs:
+                for doc in docs[:2]:
                     contexts.append(doc.page_content)
                 print('contexts: ', contexts)
 

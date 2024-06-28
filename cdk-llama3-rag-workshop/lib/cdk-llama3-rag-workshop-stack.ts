@@ -30,7 +30,7 @@ const enableReference = 'true';
 let opensearch_url = "";
 const debugMessageMode = 'false'; // if true, debug messages will be delivered to the client.
 const useParallelRAG = 'true';
-const numberOfRelevantDocs = '6';
+const numberOfRelevantDocs = '4';
 const supportedFormat = JSON.stringify(["pdf", "txt", "csv", "pptx", "ppt", "docx", "doc", "xlsx", "py", "js", "md", "jpeg", "jpg", "png"]);  
 
 const max_object_size = 102400000; // 100 MB max size of an object, 50MB(default)
