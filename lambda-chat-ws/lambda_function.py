@@ -407,86 +407,6 @@ def get_summary(chat, docs):
     
     return summary
 
-def generate_code(connectionId, requestId, chat, text, context, mode):
-    if mode == 'py':    
-        system = (
-            """다음의 <context> tag안에는 질문과 관련된 python code가 있습니다. 주어진 예제를 참조하여 질문과 관련된 python 코드를 생성합니다. Assistant의 이름은 서연입니다. 결과는 <result> tag를 붙여주세요. 답변은 한국어로 합니다.
-            
-            <context>
-            {context}
-            </context>"""
-        )
-    elif mode == 'js':
-        system = (
-            """다음의 <context> tag안에는 질문과 관련된 node.js code가 있습니다. 주어진 예제를 참조하여 질문과 관련된 node.js 코드를 생성합니다. Assistant의 이름은 서연입니다. 결과는 <result> tag를 붙여주세요.
-            
-            <context>
-            {context}
-            </context>"""
-        )
-    
-    human = "<context>{text}</context>"
-    
-    prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human)])
-    print('prompt: ', prompt)
-    
-    chain = prompt | chat    
-    try: 
-        isTyping(connectionId, requestId)  
-        stream = chain.invoke(
-            {
-                "context": context,
-                "text": text
-            }
-        )
-        
-        geenerated_code = readStreamMsg(connectionId, requestId, stream.content)
-                              
-        geenerated_code = stream.content        
-        print('result of code generation: ', geenerated_code)
-    except Exception:
-        err_msg = traceback.format_exc()
-        print('error message: ', err_msg)                    
-        raise Exception ("Not able to request to LLM")
-    
-    return geenerated_code
-
-def summary_of_code(chat, code, mode):
-    if mode == 'py':
-        system = (
-            "다음의 <article> tag에는 python code가 있습니다. code의 전반적인 목적에 대해 설명하고, 각 함수의 기능과 역할을 자세하게 한국어 500자 이내로 설명하세요."
-        )
-    elif mode == 'js':
-        system = (
-            "다음의 <article> tag에는 node.js code가 있습니다. code의 전반적인 목적에 대해 설명하고, 각 함수의 기능과 역할을 자세하게 한국어 500자 이내로 설명하세요."
-        )
-    else:
-        system = (
-            "다음의 <article> tag에는 code가 있습니다. code의 전반적인 목적에 대해 설명하고, 각 함수의 기능과 역할을 자세하게 한국어 500자 이내로 설명하세요."
-        )
-    
-    human = "<article>{code}</article>"
-    
-    prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human)])
-    print('prompt: ', prompt)
-    
-    chain = prompt | chat    
-    try: 
-        result = chain.invoke(
-            {
-                "code": code
-            }
-        )
-        
-        summary = result.content
-        print('result of code summarization: ', summary)
-    except Exception:
-        err_msg = traceback.format_exc()
-        print('error message: ', err_msg)                    
-        raise Exception ("Not able to request to LLM")
-    
-    return summary
-
 def revise_question(connectionId, requestId, chat, query):    
     global history_length, token_counter_history    
     history_length = token_counter_history = 0
@@ -535,25 +455,6 @@ def revise_question(connectionId, requestId, chat, query):
             
         sendErrorMessage(connectionId, requestId, err_msg)    
         raise Exception ("Not able to request to LLM")
-
-    if debugMessageMode == 'true':  
-        chat_history = ""
-        for dialogue_turn in history:
-            #print('type: ', dialogue_turn.type)
-            #print('content: ', dialogue_turn.content)
-            
-            dialog = f"{dialogue_turn.type}: {dialogue_turn.content}\n"            
-            chat_history = chat_history + dialog
-                
-        history_length = len(chat_history)
-        print('chat_history length: ', history_length)
-        
-        token_counter_history = 0
-        if chat_history:
-            token_counter_history = chat.get_num_tokens(chat_history)
-            print('token_size of history: ', token_counter_history)
-            
-        sendDebugMessage(connectionId, requestId, f"새로운 질문: {revised_question}\n * 대화이력({str(history_length)}자, {token_counter_history} Tokens)을 활용하였습니다.")
             
     return revised_question    
     # return revised_question.replace("\n"," ")
@@ -1544,14 +1445,6 @@ def getResponse(connectionId, jsonBody):
 
                 msg = get_summary(chat, contexts)
                 
-            elif file_type == 'py' or file_type == 'js':
-                s3r = boto3.resource("s3")
-                doc = s3r.Object(s3_bucket, s3_prefix+'/'+object)
-                
-                contents = doc.get()['Body'].read().decode('utf-8')
-                                
-                msg = summary_of_code(chat, contents, file_type)          
-                                                            
             else:
                 msg = "uploaded file: "+object
                                                         
