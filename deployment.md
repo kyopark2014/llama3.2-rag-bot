@@ -77,7 +77,10 @@ cdk deploy --all
 
 아래와 같이 Output의 HtmlUpdateCommend을 붙여넣기 합니다. 
 
-![noname](https://github.com/kyopark2014/llm-multimodal-and-rag/assets/52392004/1e273934-07ba-4319-bbdb-82445e424568)
+![noname](https://github.com/kyopark2014/llama3-rag-workshop/assets/52392004/103ad54b-6628-4135-80d9-15a33ac2d384)
+
+
+
 
 9) Hybrid 검색을 위한 Nori Plug-in 설치
 
