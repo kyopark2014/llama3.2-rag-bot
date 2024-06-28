@@ -1,6 +1,14 @@
 # Llama3로 RAG를 구현하기 (Workshop)
 
-Llama3를 이용해 RAG를 구현합니다. 전체적인 Architecture는 아래와 같습니다.
+Llama3를 이용해 RAG를 구현하는 과정을 설명합니다. 전체적인 Architecture는 아래와 같습니다.
+
+1) 브라우저를 이용하여 CloudFront의 Domain로 접속하면 S3에 있는 html, css, js를 이용해 채팅화면 UI를 구성합니다.
+2) 사용자가 userId를 넣고 접속하면, DynamoDB에 저장된 과거의 채팅이력을 조회하여 화면에 표시합니다.
+3) 사용자가 채팅창에서 메시지를 입력하면 메시지는 WebSocket을 지원하는 API-Gateway를 통해 Lambda (chat)에 전달됩니다.
+4) Lambda(chat)은 userId로 된 채팅이력이 있는지 조회하여 로드합니다.
+5) 채팅 이력과 현재의 질문을 조합하여 새로운 질문을 만든후에, Embedding후 Vector store인 OpenSearch에 조회합니다.
+6) 새로운 질문(Revised Question)과 RAG로 얻어진 관련된 문서들(Relevant documents)를 context로 Llama3 LLM에 답변을 요청합니다.
+7) Llama3가 생성한 답변은 Lambda (chat)과 API Gateway를 거쳐서 Client에 Websocket으로 전달됩니다. 
 
 <img src="./images/basic-architecture.png" width="800">
 
