@@ -12,7 +12,6 @@ import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as apigatewayv2 from 'aws-cdk-lib/aws-apigatewayv2';
 import * as opensearch from 'aws-cdk-lib/aws-opensearchservice';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
-import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import * as lambdaEventSources from 'aws-cdk-lib/aws-lambda-event-sources';
 import * as sqs from 'aws-cdk-lib/aws-sqs';
 import { SqsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
@@ -475,54 +474,6 @@ export class CdkLlama3RagWorkshopStack extends cdk.Stack {
         description: 'The URL of connection',
       });
     }
-
-    const googleApiSecret = new secretsmanager.Secret(this, `google-api-secret-for-${projectName}`, {
-      description: 'secret for google api key',
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-      secretName: `googl_api_key-${projectName}`,
-      generateSecretString: {
-        secretStringTemplate: JSON.stringify({ 
-          google_cse_id: 'cse_id'
-        }),
-        generateStringKey: 'google_api_key',
-        excludeCharacters: '/@"',
-      },
-
-    });
-    googleApiSecret.grantRead(roleLambdaWebsocket) 
-
-    const weatherApiSecret = new secretsmanager.Secret(this, `weather-api-secret-for-${projectName}`, {
-      description: 'secret for weather api key', // openweathermap
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-      secretName: `openweathermap-${projectName}`,
-      secretObjectValue: {
-        project_name: cdk.SecretValue.unsafePlainText(projectName),
-        weather_api_key: cdk.SecretValue.unsafePlainText(''),
-      },
-    });
-    weatherApiSecret.grantRead(roleLambdaWebsocket) 
-
-    const langsmithApiSecret = new secretsmanager.Secret(this, `weather-langsmith-secret-for-${projectName}`, {
-      description: 'secret for lamgsmith api key', // openweathermap
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-      secretName: `langsmithapikey-${projectName}`,
-      secretObjectValue: {
-        langchain_project: cdk.SecretValue.unsafePlainText(projectName),
-        langsmith_api_key: cdk.SecretValue.unsafePlainText(''),
-      },
-    });
-    langsmithApiSecret.grantRead(roleLambdaWebsocket) 
-
-    const tavilyApiSecret = new secretsmanager.Secret(this, `weather-tavily-secret-for-${projectName}`, {
-      description: 'secret for lamgsmith api key', // openweathermap
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-      secretName: `tavilyapikey-${projectName}`,
-      secretObjectValue: {
-        project_name: cdk.SecretValue.unsafePlainText(projectName),
-        tavily_api_key: cdk.SecretValue.unsafePlainText(''),
-      },
-    });
-    tavilyApiSecret.grantRead(roleLambdaWebsocket) 
 
     // lambda-chat using websocket    
     const lambdaChatWebsocket = new lambda.DockerImageFunction(this, `lambda-chat-ws-for-${projectName}`, {

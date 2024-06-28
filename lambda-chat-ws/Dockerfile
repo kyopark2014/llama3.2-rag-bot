@@ -15,10 +15,8 @@ RUN /var/lang/bin/python3 -m pip install langchain-aws
 RUN /var/lang/bin/python3 -m pip install unstructured
 RUN /var/lang/bin/python3 -m pip install opensearch-py
 RUN /var/lang/bin/python3 -m pip install faiss-cpu
-RUN /var/lang/bin/python3 -m pip install google-api-python-client
 RUN /var/lang/bin/python3 -m pip install python-pptx
 RUN /var/lang/bin/python3 -m pip install python-docx
-RUN /var/lang/bin/python3 -m pip install pytz
 
 RUN /var/lang/bin/python3 -m pip install botocore --upgrade
 RUN /var/lang/bin/python3 -m pip install boto3 --upgrade

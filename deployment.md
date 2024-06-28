@@ -5,15 +5,6 @@
 여기서는 Multi-Region LLM을 사용하기 위하여, 아래 링크에 접속하여, [Edit]를 선택한 후에 모든 모델을 사용할 수 있도록 설정합니다. 특히 "Llama 3 70B Instruct", "Titan Embeddings G1 - Text", "Titan Text Embedding V2"은 LLM 및 Vector Embedding을 위해서 반드시 사용이 가능하여야 합니다.
 
 - [Model access - Oregon](https://us-west-2.console.aws.amazon.com/bedrock/home?region=us-west-2#/modelaccess)
-- [Model access - N.Virginia](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/modelaccess)
-- [Model access - Canada](https://ca-central-1.console.aws.amazon.com/bedrock/home?region=ca-central-1#/modelaccess)
-- [Model access - London](https://eu-west-2.console.aws.amazon.com/bedrock/home?region=eu-west-2#/modelaccess)
-
-<!-- 
-- [Model access - Sydney](https://ap-southeast-2.console.aws.amazon.com/bedrock/home?region=ap-southeast-2#/modelaccess),
-- [Model access - Paris](https://eu-west-3.console.aws.amazon.com/bedrock/home?region=eu-west-3#/modelaccess)
-- [Model access - Mumbai](https://ap-south-1.console.aws.amazon.com/bedrock/home?region=ap-south-1#/modelaccess)  -->
-
 
 <img src="./images/models.png" width="800">
    
@@ -48,13 +39,13 @@ chmod a+rx resize.sh && ./resize.sh 80
 4) 소스를 다운로드합니다.
 
 ```java
-git clone https://github.com/kyopark2014/llama3-rag
+git clone https://github.com/kyopark2014/llama3-rag-workshop
 ```
 
 5) cdk 폴더로 이동하여 필요한 라이브러리를 설치합니다.
 
 ```java
-cd llama3-rag/cdk-llama3-rag-bot/ && npm install
+cd llama3-rag-workshop/cdk-llama3-rag-workshop/ && npm install
 ```
 
 6) CDK 사용을 위해 Bootstraping을 수행합니다.
@@ -93,13 +84,5 @@ cdk deploy --all
 [OpenSearch Console](https://ap-northeast-2.console.aws.amazon.com/aos/home?region=ap-northeast-2#opensearch/domains)에서 "korean-chatbot-with-rag"로 들어가서 [Packages] - [Associate package]을 선택한 후에, 아래와 같이 "analysis-nori"을 설치합니다. 
 
 ![image](https://github.com/kyopark2014/korean-chatbot-using-amazon-bedrock/assets/52392004/b91c91a1-b13c-4f5d-bd58-1c8298b2f128)
-
-10) Google API Key Update하기
-
-[api_key](https://developers.google.com/custom-search/docs/paid_element?hl=ko#api_key)에서 [키 가져오기] - [Select or create project]를 선택하여 Google API Key를 가져옵니다. 만약 기존 키가 없다면 새로 생성합니다.
-
-[새 검색엔진 만들기](https://programmablesearchengine.google.com/controlpanel/create?hl=ko)에서 검색엔진을 설정합니다. 이때, 검색할 내용은 "전체 웹 검색"을 선택하여야 합니다.
-
-[Secret Console](https://ap-northeast-2.console.aws.amazon.com/secretsmanager/secret?name=googl_api_key&region=ap-northeast-2)에 접속하여 [Retrieve secret value]를 선택하여, google_api_key와 google_cse_id를 업데이트합니다.
 
 11) Output의 WebUrlforllmmultimodalandrag 복사하여 브라우저로 접속합니다.

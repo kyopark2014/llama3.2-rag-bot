@@ -8,34 +8,25 @@ import csv
 import traceback
 import re
 import base64
-import requests
 
 from io import BytesIO
 from urllib import parse
 from botocore.config import Config
-from PIL import Image
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.memory import ConversationBufferWindowMemory
-from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 
 from langchain_community.docstore.document import Document
 from langchain_community.vectorstores.faiss import FAISS
 from langchain_community.vectorstores.opensearch_vector_search import OpenSearchVectorSearch
 from langchain_community.embeddings import BedrockEmbeddings
 from multiprocessing import Process, Pipe
-from googleapiclient.discovery import build
 
 from langchain_core.prompts import MessagesPlaceholder, ChatPromptTemplate
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_aws import ChatBedrock
-from langchain_core.prompts import PromptTemplate
 
 from langchain.agents import tool
-from langchain.agents import AgentExecutor, create_react_agent
-from bs4 import BeautifulSoup
-from pytz import timezone
-from langchain_community.tools.tavily_search import TavilySearchResults
 from opensearchpy import OpenSearch
 
 s3 = boto3.client('s3')
@@ -74,79 +65,11 @@ token_counter_history = 0
 
 minDocSimilarity = 200
 projectName = os.environ.get('projectName')
-
-# google search api
-googleApiSecret = os.environ.get('googleApiSecret')
-secretsmanager = boto3.client('secretsmanager')
-try:
-    get_secret_value_response = secretsmanager.get_secret_value(
-        SecretId=googleApiSecret
-    )
-    #print('get_secret_value_response: ', get_secret_value_response)
-    secret = json.loads(get_secret_value_response['SecretString'])
-    #print('secret: ', secret)
-    google_api_key = secret['google_api_key']
-    google_cse_id = secret['google_cse_id']
-    #print('google_cse_id: ', google_cse_id)    
-
-except Exception as e:
-    raise e
-
-# api key to get weather information in agent
-try:
-    get_weather_api_secret = secretsmanager.get_secret_value(
-        SecretId=f"openweathermap-{projectName}"
-    )
-    #print('get_weather_api_secret: ', get_weather_api_secret)
-    secret = json.loads(get_weather_api_secret['SecretString'])
-    #print('secret: ', secret)
-    weather_api_key = secret['weather_api_key']
-
-except Exception as e:
-    raise e
-   
-# api key to use LangSmith
-langsmith_api_key = ""
-try:
-    get_langsmith_api_secret = secretsmanager.get_secret_value(
-        SecretId=f"langsmithapikey-{projectName}"
-    )
-    #print('get_langsmith_api_secret: ', get_langsmith_api_secret)
-    secret = json.loads(get_langsmith_api_secret['SecretString'])
-    #print('secret: ', secret)
-    langsmith_api_key = secret['langsmith_api_key']
-    langchain_project = secret['langchain_project']
-except Exception as e:
-    raise e
-
-if langsmith_api_key:
-    os.environ["LANGCHAIN_API_KEY"] = langsmith_api_key
-    os.environ["LANGCHAIN_TRACING_V2"] = "true"
-    os.environ["LANGCHAIN_PROJECT"] = langchain_project
-    
-# api key to use Tavily Search
-tavily_api_key = ""
-try:
-    get_tavily_api_secret = secretsmanager.get_secret_value(
-        SecretId=f"tavilyapikey-{projectName}"
-    )
-    #print('get_tavily_api_secret: ', get_tavily_api_secret)
-    secret = json.loads(get_tavily_api_secret['SecretString'])
-    #print('secret: ', secret)
-    tavily_api_key = secret['tavily_api_key']
-except Exception as e: 
-    raise e
-
-if tavily_api_key:
-    os.environ["TAVILY_API_KEY"] = tavily_api_key
     
 # websocket
 connection_url = os.environ.get('connection_url')
 client = boto3.client('apigatewaymanagementapi', endpoint_url=connection_url)
 print('connection_url: ', connection_url)
-
-HUMAN_PROMPT = "\n\nHuman:"
-AI_PROMPT = "\n\nAssistant:"
 
 map_chain = dict() 
 
@@ -306,7 +229,7 @@ def general_conversation(connectionId, requestId, chat, query):
     
     if isKorean(query)==True :
         system = (
-            "다음의 Human과 Assistant의 친근한 이전 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다."
+            "다음의 Human과 Assistant의 친근한 이전 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다. 답변은 한국어로 합니다."
         )
     else: 
         system = (
@@ -415,7 +338,7 @@ def check_grammer(chat, text):
         
     if isKorean(text)==True:
         system = (
-            "다음의 <article> tag안의 문장의 오류를 찾아서 설명하고, 오류가 수정된 문장을 답변 마지막에 추가하여 주세요."
+            "다음의 <article> tag안의 문장의 오류를 찾아서 설명하고, 오류가 수정된 문장을 답변 마지막에 추가하여 주세요. 답변은 한국어로 합니다."
         )
     else: 
         system = (
@@ -455,7 +378,7 @@ def get_summary(chat, docs):
     
     if isKorean(text)==True:
         system = (
-            "다음의 <article> tag안의 문장을 요약해서 500자 이내로 설명하세오."
+            "다음의 <article> tag안의 문장을 요약해서 500자 이내의 한국어로 설명하세오."
         )
     else: 
         system = (
@@ -487,7 +410,7 @@ def get_summary(chat, docs):
 def generate_code(connectionId, requestId, chat, text, context, mode):
     if mode == 'py':    
         system = (
-            """다음의 <context> tag안에는 질문과 관련된 python code가 있습니다. 주어진 예제를 참조하여 질문과 관련된 python 코드를 생성합니다. Assistant의 이름은 서연입니다. 결과는 <result> tag를 붙여주세요.
+            """다음의 <context> tag안에는 질문과 관련된 python code가 있습니다. 주어진 예제를 참조하여 질문과 관련된 python 코드를 생성합니다. Assistant의 이름은 서연입니다. 결과는 <result> tag를 붙여주세요. 답변은 한국어로 합니다.
             
             <context>
             {context}
@@ -572,7 +495,7 @@ def revise_question(connectionId, requestId, chat, query):
         system = (
             ""
         )  
-        human = """이전 대화를 참조하여, 다음의 <question>의 뜻을 명확히 하는 새로운 질문을 한국어로 생성하세요. 새로운 질문은 원래 질문의 중요한 단어를 반드시 포함합니다. 결과는 <result> tag를 붙여주세요.
+        human = """이전 대화를 참조하여, 다음의 <question>의 뜻을 명확히 하는 새로운 질문을 한국어로 생성하세요. 새로운 질문은 원래 질문의 중요한 단어를 반드시 포함합니다. 결과는 <result> tag를 붙여주세요. 답변은 한국어로 합니다.
         
         <question>            
         {question}
@@ -638,7 +561,7 @@ def revise_question(connectionId, requestId, chat, query):
 def query_using_RAG_context(connectionId, requestId, chat, context, revised_question):    
     if isKorean(revised_question)==True:
         system = (
-            """다음의 <context> tag안의 참고자료를 이용하여 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다.
+            """다음의 <context> tag안의 참고자료를 이용하여 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다. 답변은 한국어로 합니다.
             
             <context>
             {context}
@@ -680,70 +603,6 @@ def query_using_RAG_context(connectionId, requestId, chat, context, revised_ques
 
     return msg
     
-def use_multimodal(chat, img_base64, query):    
-    if query == "":
-        query = "그림에 대해 상세히 설명해줘."
-    
-    messages = [
-        SystemMessage(content="답변은 500자 이내의 한국어로 설명해주세요."),
-        HumanMessage(
-            content=[
-                {
-                    "type": "image_url",
-                    "image_url": {
-                        "url": f"data:image/png;base64,{img_base64}", 
-                    },
-                },
-                {
-                    "type": "text", "text": query
-                },
-            ]
-        )
-    ]
-    
-    try: 
-        result = chat.invoke(messages)
-        
-        summary = result.content
-        print('result of code summarization: ', summary)
-    except Exception:
-        err_msg = traceback.format_exc()
-        print('error message: ', err_msg)                    
-        raise Exception ("Not able to request to LLM")
-    
-    return summary
-
-def extract_text(chat, img_base64):    
-    query = "텍스트를 추출해서 utf8로 변환하세요. <result> tag를 붙여주세요."
-    
-    messages = [
-        HumanMessage(
-            content=[
-                {
-                    "type": "image_url",
-                    "image_url": {
-                        "url": f"data:image/png;base64,{img_base64}", 
-                    },
-                },
-                {
-                    "type": "text", "text": query
-                },
-            ]
-        )
-    ]
-    
-    try: 
-        result = chat.invoke(messages)
-        
-        extracted_text = result.content
-        print('result of text extraction from an image: ', extracted_text)
-    except Exception:
-        err_msg = traceback.format_exc()
-        print('error message: ', err_msg)                    
-        raise Exception ("Not able to request to LLM")
-    
-    return extracted_text
-
 # load documents from s3 
 def load_document(file_type, s3_file_name):
     s3r = boto3.resource("s3")
@@ -1002,14 +861,7 @@ def get_reference(docs):
                 reference = reference + f"{i+1}. {page}page in <a href={uri} target=_blank>{name}</a>, {doc['rag_type']} ({doc['assessed_score']})\n"
             else:
                 reference = reference + f"{i+1}. <a href={uri} target=_blank>{name}</a>, {doc['rag_type']} ({doc['assessed_score']}), <a href=\"#\" onClick=\"alert(`{excerpt}`)\">관련문서</a>\n"
-                    
-        elif doc['rag_type'] == 'search': # google search
-            # print(f'## Document(get_reference) {i+1}: {doc}')
-                
-            uri = doc['metadata']['source']
-            name = doc['metadata']['title']
-            reference = reference + f"{i+1}. <a href={uri} target=_blank>{name}</a>, {doc['rag_type']} ({doc['assessed_score']}), <a href=\"#\" onClick=\"alert(`{excerpt}`)\">관련문서</a>\n"
-                           
+                                               
     return reference
 
 def get_documents_from_opensearch(vectorstore_opensearch, query, top_k):
@@ -1464,52 +1316,6 @@ def retrieve_docs_from_RAG(revised_question, connectionId, requestId, bedrock_em
         selected_relevant_docs = priority_search(revised_question, relevant_docs, minDocSimilarity)
         print('selected_relevant_docs: ', json.dumps(selected_relevant_docs))
         
-        if len(selected_relevant_docs)==0:  # google api
-            print('No relevant document! So use google api')            
-            api_key = google_api_key
-            cse_id = google_cse_id 
-                
-            relevant_docs = []
-            try: 
-                service = build("customsearch", "v1", developerKey=api_key)
-                result = service.cse().list(q=revised_question, cx=cse_id).execute()
-                # print('google search result: ', result)
-
-                if "items" in result:
-                    for item in result['items']:
-                        api_type = "google api"
-                        excerpt = item['snippet']
-                        uri = item['link']
-                        title = item['title']
-                        confidence = ""
-                        assessed_score = ""
-                            
-                        doc_info = {
-                            "rag_type": 'search',
-                            "api_type": api_type,
-                            "confidence": confidence,
-                            "metadata": {
-                                "source": uri,
-                                "title": title,
-                                "excerpt": excerpt,
-                                "translated_excerpt": "",
-                            },
-                            "assessed_score": assessed_score,
-                        }
-                        relevant_docs.append(doc_info)           
-                
-                if len(relevant_docs)>=1:
-                    selected_relevant_docs = priority_search(revised_question, relevant_docs, minDocSimilarity)
-                    print('selected_relevant_docs: ', json.dumps(selected_relevant_docs))
-                    # print('selected_relevant_docs (google): ', selected_relevant_docs)     
-            except Exception:
-                err_msg = traceback.format_exc()
-                print('error message: ', err_msg)       
-
-                sendErrorMessage(connectionId, requestId, "Not able to use Google API. Check the credentials")    
-                #sendErrorMessage(connectionId, requestId, err_msg)    
-                #raise Exception ("Not able to search using google api") 
-
     # update doc using parent
     contentList = []
     update_docs = []
@@ -1745,51 +1551,7 @@ def getResponse(connectionId, jsonBody):
                 contents = doc.get()['Body'].read().decode('utf-8')
                                 
                 msg = summary_of_code(chat, contents, file_type)          
-            
-            elif file_type == 'png' or file_type == 'jpeg' or file_type == 'jpg':
-                print('multimodal: ', object)
-                
-                s3_client = boto3.client('s3') 
-                    
-                image_obj = s3_client.get_object(Bucket=s3_bucket, Key=s3_prefix+'/'+object)
-                # print('image_obj: ', image_obj)
-                
-                image_content = image_obj['Body'].read()
-                img = Image.open(BytesIO(image_content))
-                
-                width, height = img.size 
-                print(f"width: {width}, height: {height}, size: {width*height}")
-                
-                isResized = False
-                while(width*height > 5242880):                    
-                    width = int(width/2)
-                    height = int(height/2)
-                    isResized = True
-                    print(f"width: {width}, height: {height}, size: {width*height}")
-                
-                if isResized:
-                    img = img.resize((width, height))
-                
-                buffer = BytesIO()
-                img.save(buffer, format="PNG")
-                img_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
-                
-                commend  = jsonBody['commend']
-                print('commend: ', commend)
-                
-                # verify the image
-                msg = use_multimodal(chat, img_base64, commend)       
-                
-                # extract text from the image
-                text = extract_text(chat, img_base64)
-                extracted_text = text[text.find('<result>')+8:len(text)-9] # remove <result> tag
-                print('extracted_text: ', extracted_text)
-                if len(extracted_text)>10:
-                    msg = msg + f"\n\n[추출된 Text]\n{extracted_text}\n"
-                
-                memory_chain.chat_memory.add_user_message(f"{object}에서 텍스트를 추출하세요.")
-                memory_chain.chat_memory.add_ai_message(extracted_text)
-                                                
+                                                            
             else:
                 msg = "uploaded file: "+object
                                                         
