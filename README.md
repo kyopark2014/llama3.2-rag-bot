@@ -1,6 +1,6 @@
 # Llama3로 RAG를 구현하기 
 
-Llama3를 이용해 RAG를 구현하는 과정을 설명합니다. 전체적인 Architecture는 아래와 같습니다.
+Llama3를 이용해 RAG를 구현하는 과정을 설명합니다. 여기에서는 Advanced RAG에서 성능 향상을 위해 활용되는 parent/child chunking, lexical/semantic 검색등이 포함되어 있습니다. 전체적인 Architecture는 아래와 같습니다.
 
 1) 브라우저를 이용하여 CloudFront의 Domain로 접속하면 S3에 있는 html, css, js를 이용해 채팅화면 UI를 구성합니다.
 2) 사용자가 userId를 넣고 접속하면, DynamoDB에 저장된 과거의 채팅이력을 조회하여 화면에 표시합니다.
