@@ -399,7 +399,7 @@ msg = query_using_RAG_context(connectionId, requestId, chat, relevant_context, r
 
 ### RAG의 Parent/Child Chunking
 
-문서를 크기에 따라 parent chunk와 child chunk로 나누어서 child chunk를 찾은 후에 LLM의 context에는 parent chunk를 사용하면, 검색의 정확도는 높이고 충분한 문서를 context로 활용할 수 있습니다.
+문서를 크기에 따라 parent chunk와 child chunk로 나누어서 child chunk를 찾은 후에 LLM의 context에는 parent chunk를 사용하면, 검색의 정확도는 높이고 충분한 문서를 context로 활용할 수 있습니다. RAG의 검색정확도를 향상시키기 위한 여러가지 방법중에 Parent/Child Chunking을 이용할 수 있습니다. [parent-document-retrieval.md](https://github.com/kyopark2014/korean-chatbot-using-amazon-bedrock/blob/main/parent-document-retrieval.md)에서는 Parent/child로 chunking 전략에 대해 설명하고 있습니다.
 
 ```python
 parent_splitter = RecursiveCharacterTextSplitter(
