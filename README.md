@@ -1,4 +1,4 @@
-# Llama3로 RAG를 구현하기 (Workshop)
+# Llama3로 RAG를 구현하기 
 
 Llama3를 이용해 RAG를 구현하는 과정을 설명합니다. 전체적인 Architecture는 아래와 같습니다.
 
