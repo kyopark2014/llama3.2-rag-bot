@@ -325,7 +325,7 @@ def summary_of_code(chat, code, mode):
 
 ### RAG
 
-RAG에서는 <context> tag를 이용해 Relevant Documents를 넣도록  Prompt를 구성합니다. 
+RAG에서는 context tag를 이용해 Relevant Documents를 넣도록  Prompt를 구성합니다. 
 
 ```python
 def query_using_RAG_context(connectionId, requestId, chat, context, revised_question):    
