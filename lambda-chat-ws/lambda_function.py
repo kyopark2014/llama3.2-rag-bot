@@ -8,7 +8,6 @@ import csv
 import traceback
 import re
 import base64
-import pytz
 
 from io import BytesIO
 from urllib import parse
@@ -185,7 +184,8 @@ def get_embedding():
     bedrock_embedding = BedrockEmbeddings(
         client=boto3_bedrock,
         region_name = bedrock_region,
-        model_id = model_id
+        model_id = model_id,
+        model_kwargs={'stop': ['Stop!']}
     )  
     
     selected_embedding = selected_embedding + 1
@@ -1001,7 +1001,7 @@ tools = [get_current_time, get_book_list, get_weather_info, search_by_tavily, se
 
 def get_react_prompt_template(): # (hwchase17/react) https://smith.langchain.com/hub/hwchase17/react
     # Get the react prompt template    
-    return PromptTemplate.from_template("""<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n다음은 Human과 Assistant의 친근한 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다.
+    return PromptTemplate.from_template("""다음은 Human과 Assistant의 친근한 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다.
 
 사용할 수 있는 tools은 아래와 같습니다:
 
@@ -1026,8 +1026,8 @@ Final Answer: [your response here]
 
 Begin!
 
-Question:<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n{input}<|eot_id|>
-<|start_header_id|>assistant<|end_header_id|>\n\nThought:{agent_scratchpad}<|eot_id|>
+Question: {input}
+Thought:{agent_scratchpad}
 """)
         
 def run_agent_react(connectionId, requestId, chat, query):
