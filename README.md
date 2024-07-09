@@ -630,6 +630,22 @@ def priority_search(query, relevant_docs, bedrock_embeddings):
     return docs
 ```
 
+### LangChain Agent
+
+ChatBedrock의 Llama3를 지원하고 있지만 Agent는 아직 지원하고 있지 않습니다. 관련 에러는 아래와 같습니다. 
+
+```text
+for chunk in self._prepare_input_and_invoke_stream(
+File "/var/lang/lib/python3.11/site-packages/langchain_aws/llms/bedrock.py", line 756, in _prepare_input_and_invoke_stream
+raise ValueError(
+ValueError: Stop sequence key name for meta is not supported.
+```
+
+관련 이슈는 아래와 같습니다.
+
+[Stop sequence key name for meta is not supported](https://github.com/langchain-ai/langchain/issues/19220)
+
+[Error : Stop sequence key name for {meta or mistral or any other mode} is not supported](https://github.com/langchain-ai/langchain/issues/20053)
 
 ## 직접 실습 해보기
 
