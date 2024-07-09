@@ -25,8 +25,13 @@ from multiprocessing import Process, Pipe
 from langchain_core.prompts import MessagesPlaceholder, ChatPromptTemplate
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_aws import ChatBedrock
+from langchain_core.prompts import PromptTemplate
 
 from langchain.agents import tool
+from langchain.agents import AgentExecutor, create_react_agent
+from bs4 import BeautifulSoup
+from pytz import timezone
+from langchain_community.tools.tavily_search import TavilySearchResults
 from opensearchpy import OpenSearch
 
 s3 = boto3.client('s3')
@@ -65,6 +70,55 @@ token_counter_history = 0
 
 minDocSimilarity = 200
 projectName = os.environ.get('projectName')
+
+# api key to get weather information in agent
+secretsmanager = boto3.client('secretsmanager')
+try:
+    get_weather_api_secret = secretsmanager.get_secret_value(
+        SecretId=f"openweathermap-{projectName}"
+    )
+    #print('get_weather_api_secret: ', get_weather_api_secret)
+    secret = json.loads(get_weather_api_secret['SecretString'])
+    #print('secret: ', secret)
+    weather_api_key = secret['weather_api_key']
+
+except Exception as e:
+    raise e
+   
+# api key to use LangSmith
+langsmith_api_key = ""
+try:
+    get_langsmith_api_secret = secretsmanager.get_secret_value(
+        SecretId=f"langsmithapikey-{projectName}"
+    )
+    #print('get_langsmith_api_secret: ', get_langsmith_api_secret)
+    secret = json.loads(get_langsmith_api_secret['SecretString'])
+    #print('secret: ', secret)
+    langsmith_api_key = secret['langsmith_api_key']
+    langchain_project = secret['langchain_project']
+except Exception as e:
+    raise e
+
+if langsmith_api_key:
+    os.environ["LANGCHAIN_API_KEY"] = langsmith_api_key
+    os.environ["LANGCHAIN_TRACING_V2"] = "true"
+    os.environ["LANGCHAIN_PROJECT"] = langchain_project
+    
+# api key to use Tavily Search
+tavily_api_key = ""
+try:
+    get_tavily_api_secret = secretsmanager.get_secret_value(
+        SecretId=f"tavilyapikey-{projectName}"
+    )
+    #print('get_tavily_api_secret: ', get_tavily_api_secret)
+    secret = json.loads(get_tavily_api_secret['SecretString'])
+    #print('secret: ', secret)
+    tavily_api_key = secret['tavily_api_key']
+except Exception as e: 
+    raise e
+
+if tavily_api_key:
+    os.environ["TAVILY_API_KEY"] = tavily_api_key
     
 # websocket
 connection_url = os.environ.get('connection_url')
@@ -737,6 +791,367 @@ def priority_search(query, relevant_docs, minSimilarity):
 
     return docs
 
+@tool 
+def get_book_list(keyword: str) -> str:
+    """
+    Search book list by keyword and then return book list
+    keyword: search keyword
+    return: book list
+    """
+    
+    keyword = keyword.replace('\'','')
+
+    answer = ""
+    url = f"https://search.kyobobook.co.kr/search?keyword={keyword}&gbCode=TOT&target=total"
+    response = requests.get(url)
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, "html.parser")
+        prod_info = soup.find_all("a", attrs={"class": "prod_info"})
+        
+        if len(prod_info):
+            answer = "추천 도서는 아래와 같습니다.\n"
+            
+        for prod in prod_info[:5]:
+            title = prod.text.strip().replace("\n", "")       
+            link = prod.get("href")
+            answer = answer + f"{title}, URL: {link}\n\n"
+    
+    return answer
+    
+@tool
+def get_current_time(format: str=f"%Y-%m-%d %H:%M:%S")->str:
+    """Returns the current date and time in the specified format"""
+    # f"%Y-%m-%d %H:%M:%S"
+    
+    format = format.replace('\'','')
+    timestr = datetime.datetime.now(timezone('Asia/Seoul')).strftime(format)
+    # print('timestr:', timestr)
+    
+    return timestr
+
+@tool
+def get_weather_info(city: str) -> str:
+    """
+    Search weather information by city name and then return weather statement.
+    city: the english name of city to search
+    return: weather statement
+    """    
+    
+    city = city.replace('\n','')
+    city = city.replace('\'','')
+    
+    chat = get_chat()
+                
+    if isKorean(city):
+        place = traslation(chat, city, "Korean", "English")
+        print('city (translated): ', place)
+    else:
+        place = city
+        city = traslation(chat, city, "English", "Korean")
+        print('city (translated): ', city)
+        
+    print('place: ', place)
+    
+    weather_str: str = f"{city}에 대한 날씨 정보가 없습니다."
+    if weather_api_key: 
+        apiKey = weather_api_key
+        lang = 'en' 
+        units = 'metric' 
+        api = f"https://api.openweathermap.org/data/2.5/weather?q={place}&APPID={apiKey}&lang={lang}&units={units}"
+        # print('api: ', api)
+                
+        try:
+            result = requests.get(api)
+            result = json.loads(result.text)
+            print('result: ', result)
+        
+            if 'weather' in result:
+                overall = result['weather'][0]['main']
+                current_temp = result['main']['temp']
+                min_temp = result['main']['temp_min']
+                max_temp = result['main']['temp_max']
+                humidity = result['main']['humidity']
+                wind_speed = result['wind']['speed']
+                cloud = result['clouds']['all']
+                
+                weather_str = f"{city}의 현재 날씨의 특징은 {overall}이며, 현재 온도는 {current_temp}도 이고, 최저온도는 {min_temp}도, 최고 온도는 {max_temp}도 입니다. 현재 습도는 {humidity}% 이고, 바람은 초당 {wind_speed} 미터 입니다. 구름은 {cloud}% 입니다."
+                #weather_str = f"Today, the overall of {city} is {overall}, current temperature is {current_temp} degree, min temperature is {min_temp} degree, highest temperature is {max_temp} degree. huminity is {humidity}%, wind status is {wind_speed} meter per second. the amount of cloud is {cloud}%."            
+        except Exception:
+            err_msg = traceback.format_exc()
+            print('error message: ', err_msg)                    
+            # raise Exception ("Not able to request to LLM")    
+        
+    print('weather_str: ', weather_str)                            
+    return weather_str
+
+@tool
+def search_by_tavily(keyword: str) -> str:
+    """
+    Search general information by keyword and then return the result as a string.
+    keyword: search keyword
+    return: the information of keyword
+    """    
+    
+    answer = ""    
+    if tavily_api_key:
+        keyword = keyword.replace('\'','')
+        
+        search = TavilySearchResults(k=3)
+                    
+        output = search.invoke(keyword)
+        print('tavily output: ', output)
+        
+        for result in output:
+            print('result: ', result)
+            if result:
+                content = result.get("content")
+                url = result.get("url")
+            
+                answer = answer + f"{content}, URL: {url}\n"
+        
+    return answer
+
+@tool    
+def search_by_opensearch(keyword: str) -> str:
+    """
+    Search technical information by keyword and then return the result as a string.
+    keyword: search keyword
+    return: the technical information of keyword
+    """    
+    
+    print('keyword: ', keyword)
+    keyword = keyword.replace('\'','')
+    keyword = keyword.replace('|','')
+    keyword = keyword.replace('\n','')
+    print('modified keyword: ', keyword)
+    
+    bedrock_embedding = get_embedding()
+        
+    vectorstore_opensearch = OpenSearchVectorSearch(
+        index_name = "idx-*", # all
+        is_aoss = False,
+        ef_search = 1024, # 512(default)
+        m=48,
+        #engine="faiss",  # default: nmslib
+        embedding_function = bedrock_embedding,
+        opensearch_url=opensearch_url,
+        http_auth=(opensearch_account, opensearch_passwd), # http_auth=awsauth,
+    ) 
+    
+    answer = ""
+    top_k = 2
+    
+    if enalbeParentDocumentRetrival == 'true': # parent/child chunking
+        result = vectorstore_opensearch.similarity_search_with_score(
+            query = keyword,
+            k = top_k*2,  # use double
+            pre_filter={"doc_level": {"$eq": "child"}}
+        )
+        print('result: ', result)
+                
+        relevant_documents = []
+        docList = []
+        for re in result:
+            if 'parent_doc_id' in re[0].metadata:
+                parent_doc_id = re[0].metadata['parent_doc_id']
+                doc_level = re[0].metadata['doc_level']
+                print(f"doc_level: {doc_level}, parent_doc_id: {parent_doc_id}")
+                        
+                if doc_level == 'child':
+                    if parent_doc_id in docList:
+                        print('duplicated!')
+                    else:
+                        relevant_documents.append(re)
+                        docList.append(parent_doc_id)
+                        
+                        if len(relevant_documents)>=top_k:
+                            break
+                        
+        for i, document in enumerate(relevant_documents):
+            #print(f'## Document(opensearch-vector) {i+1}: {document}')
+            
+            parent_doc_id = document[0].metadata['parent_doc_id']
+            doc_level = document[0].metadata['doc_level']
+            print(f"child: parent_doc_id: {parent_doc_id}, doc_level: {doc_level}")
+            
+            excerpt, uri = get_parent_content(parent_doc_id)
+            
+            print(f"parent_doc_id: {parent_doc_id}, doc_level: {doc_level}, uri: {uri}, content: {excerpt}")
+            
+            answer = answer + f"{excerpt}, URL: {uri}\n\n"
+    else: 
+        relevant_documents = vectorstore_opensearch.similarity_search_with_score(
+            query = keyword,
+            k = top_k,
+        )
+
+        for i, document in enumerate(relevant_documents):
+            #print(f'## Document(opensearch-vector) {i+1}: {document}')
+            
+            excerpt = document[0].page_content        
+            uri = document[0].metadata['uri']
+                            
+            answer = answer + f"{excerpt}, URL: {uri}\n\n"
+    
+    return answer
+
+# define tools
+tools = [get_current_time, get_book_list, get_weather_info, search_by_tavily, search_by_opensearch]        
+
+def get_react_prompt_template(): # (hwchase17/react) https://smith.langchain.com/hub/hwchase17/react
+    # Get the react prompt template    
+    return PromptTemplate.from_template("""다음은 Human과 Assistant의 친근한 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다.
+
+사용할 수 있는 tools은 아래와 같습니다:
+
+{tools}
+
+다음의 format을 사용하세요.:
+
+Question: 답변하여야 할 input question 
+Thought: you should always think about what to do. 
+Action: 해야 할 action로서 [{tool_names}]에서 tool의 name만을 가져옵니다. 
+Action Input: action의 input
+Observation: action의 result
+... (Thought/Action/Action Input/Observation을 5번 반복 할 수 있습니다.)
+Thought: 나는 이제 Final Answer를 알고 있습니다. 
+Final Answer: original input에 대한 Final Answer
+
+너는 Human에게 해줄 응답이 있거나, Tool을 사용하지 않아도 되는 경우에, 다음 format을 사용하세요.:
+'''
+Thought: Tool을 사용해야 하나요? No
+Final Answer: [your response here]
+'''
+
+Begin!
+
+Question: {input}
+Thought:{agent_scratchpad}
+""")
+        
+def run_agent_react(connectionId, requestId, chat, query):
+    prompt_template = get_react_prompt_template()
+    print('prompt_template: ', prompt_template)
+    
+    #from langchain import hub
+    #prompt_template = hub.pull("hwchase17/react")
+    #print('prompt_template: ', prompt_template)
+    
+     # create agent
+    isTyping(connectionId, requestId)
+    agent = create_react_agent(chat, tools, prompt_template)
+    
+    agent_executor = AgentExecutor(
+        agent=agent, 
+        tools=tools, 
+        verbose=True, 
+        handle_parsing_errors=True,
+        max_iterations = 5
+    )
+    
+    # run agent
+    response = agent_executor.invoke({"input": query})
+    print('response: ', response)
+
+    # streaming    
+    msg = readStreamMsg(connectionId, requestId, response['output'])
+
+    msg = response['output']
+    print('msg: ', msg)
+            
+    return msg
+
+def run_agent_react_chat_using_revised_question(connectionId, requestId, chat, query):
+    # revise question
+    revised_question = revise_question(connectionId, requestId, chat, query)     
+    print('revised_question: ', revised_question)  
+        
+    # get template based on react 
+    prompt_template = get_react_prompt_template()
+    print('prompt_template: ', prompt_template)
+    
+    # create agent
+    isTyping(connectionId, requestId)
+    agent = create_react_agent(chat, tools, prompt_template)
+    
+    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
+    
+    # run agent
+    response = agent_executor.invoke({"input": revised_question})
+    print('response: ', response)
+    
+    # streaming
+    msg = readStreamMsg(connectionId, requestId, response['output'])
+
+    msg = response['output']
+    print('msg: ', msg)
+            
+    return msg
+
+def get_react_chat_prompt_template():
+    # Get the react prompt template
+
+    return PromptTemplate.from_template("""다음은 Human과 Assistant의 친근한 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다.
+
+사용할 수 있는 tools은 아래와 같습니다:
+
+{tools}
+
+다음의 format을 사용하세요.:
+
+Question: 답변하여야 할 input question 
+Thought: you should always think about what to do. 
+Action: 해야 할 action로서 [{tool_names}]에서 tool의 name만을 가져옵니다. 
+Action Input: action의 input
+Observation: action의 result
+... (Thought/Action/Action Input/Observation을 5번 반복 할 수 있습니다.)
+Thought: 나는 이제 Final Answer를 알고 있습니다. 
+Final Answer: original input에 대한 Final Answer
+
+너는 Human에게 해줄 응답이 있거나, Tool을 사용하지 않아도 되는 경우에, 다음 format을 사용하세요.:
+'''
+Thought: Tool을 사용해야 하나요? No
+Final Answer: [your response here]
+'''
+
+Begin!
+
+Previous conversation history:
+{chat_history}
+
+New input: {input}
+Thought:{agent_scratchpad}
+""")
+    
+def run_agent_react_chat(connectionId, requestId, chat, query):
+    # get template based on react 
+    prompt_template = get_react_chat_prompt_template()
+    print('prompt_template: ', prompt_template)
+    
+    # create agent
+    isTyping(connectionId, requestId)
+    agent = create_react_agent(chat, tools, prompt_template)
+    
+    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
+    
+    history = memory_chain.load_memory_variables({})["chat_history"]
+    print('memory_chain: ', history)
+    
+    # run agent
+    response = agent_executor.invoke({
+        "input": query,
+        "chat_history": history
+    })
+    print('response: ', response)
+    
+    # streaming
+    msg = readStreamMsg(connectionId, requestId, response['output'])
+
+    msg = response['output']
+    print('msg: ', msg)
+            
+    return msg
+
 def get_reference(docs):
     reference = "\n\nFrom\n"
     for i, doc in enumerate(docs):
@@ -1378,7 +1793,15 @@ def getResponse(connectionId, jsonBody):
             else:       
                 if conv_type == 'normal':      # normal
                     msg = general_conversation(connectionId, requestId, chat, text)      
-                    
+                
+                elif conv_type == 'agent-react':
+                    msg = run_agent_react(connectionId, requestId, chat, text)                
+                elif conv_type == 'agent-react-chat':         
+                    if separated_chat_history=='true': 
+                        msg = run_agent_react_chat_using_revised_question(connectionId, requestId, chat, text)
+                    else:
+                        msg = run_agent_react_chat(connectionId, requestId, chat, text)
+                            
                 elif conv_type == 'qa-opensearch-vector':   # RAG - Vector
                     print(f'rag_type: {rag_type}')
                     search_type ='vector'

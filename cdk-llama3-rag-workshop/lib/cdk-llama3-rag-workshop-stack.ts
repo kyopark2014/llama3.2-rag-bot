@@ -15,6 +15,7 @@ import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as lambdaEventSources from 'aws-cdk-lib/aws-lambda-event-sources';
 import * as sqs from 'aws-cdk-lib/aws-sqs';
 import { SqsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
+import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 
 const region = process.env.CDK_DEFAULT_REGION;    
 const accountId = process.env.CDK_DEFAULT_ACCOUNT
@@ -474,6 +475,40 @@ export class CdkLlama3RagWorkshopStack extends cdk.Stack {
         description: 'The URL of connection',
       });
     }
+
+    const weatherApiSecret = new secretsmanager.Secret(this, `weather-api-secret-for-${projectName}`, {
+      description: 'secret for weather api key', // openweathermap
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      secretName: `openweathermap-${projectName}`,
+      secretObjectValue: {
+        project_name: cdk.SecretValue.unsafePlainText(projectName),
+        weather_api_key: cdk.SecretValue.unsafePlainText(''),
+      },
+    });
+    weatherApiSecret.grantRead(roleLambdaWebsocket) 
+
+    const langsmithApiSecret = new secretsmanager.Secret(this, `weather-langsmith-secret-for-${projectName}`, {
+      description: 'secret for lamgsmith api key', // openweathermap
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      secretName: `langsmithapikey-${projectName}`,
+      secretObjectValue: {
+        langchain_project: cdk.SecretValue.unsafePlainText(projectName),
+        langsmith_api_key: cdk.SecretValue.unsafePlainText(''),
+      },
+    });
+    langsmithApiSecret.grantRead(roleLambdaWebsocket) 
+
+    const tavilyApiSecret = new secretsmanager.Secret(this, `weather-tavily-secret-for-${projectName}`, {
+      description: 'secret for lamgsmith api key', // openweathermap
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      secretName: `tavilyapikey-${projectName}`,
+      secretObjectValue: {
+        project_name: cdk.SecretValue.unsafePlainText(projectName),
+        tavily_api_key: cdk.SecretValue.unsafePlainText(''),
+      },
+    });
+    tavilyApiSecret.grantRead(roleLambdaWebsocket) 
+
 
     // lambda-chat using websocket    
     const lambdaChatWebsocket = new lambda.DockerImageFunction(this, `lambda-chat-ws-for-${projectName}`, {
