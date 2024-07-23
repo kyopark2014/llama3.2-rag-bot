@@ -1,6 +1,12 @@
 # Llama3.1로 RAG를 구현하기 
 
-Llama3를 이용해 RAG를 구현하는 과정을 설명합니다. 여기에서는 Advanced RAG에서 성능 향상을 위해 활용되는 parent/child chunking, lexical/semantic 검색등이 포함되어 있습니다. 전체적인 Architecture는 아래와 같습니다.
+## Llama3.1 
+
+[Llama3.1 paper](https://scontent-ssn1-1.xx.fbcdn.net/v/t39.2365-6/452387774_1036916434819166_4173978747091533306_n.pdf?_nc_cat=104&ccb=1-7&_nc_sid=3c67a6&_nc_ohc=t6egZJ8QdI4Q7kNvgEBG6o4&_nc_ht=scontent-ssn1-1.xx&oh=00_AYBdfFc8msOH4iSUsYP_7d5LJLfxTrtJ_aV2U5elEF-Ihg&oe=66A60A8D)와 같이 다양한 업그레이드가 있었습니다. 
+
+![llama3 1](https://github.com/user-attachments/assets/9abf01bf-f044-4bbf-b825-d73035a78287)
+
+아래와 같이 Llama3.1를 이용해 RAG를 구현하는 과정을 설명합니다. 여기에서는 Advanced RAG에서 성능 향상을 위해 활용되는 parent/child chunking, lexical/semantic 검색등이 포함되어 있습니다. 전체적인 Architecture는 아래와 같습니다.
 
 1) 브라우저를 이용하여 CloudFront의 Domain로 접속하면 S3에 있는 html, css, js를 이용해 채팅화면 UI를 구성합니다.
 2) 사용자가 userId를 넣고 접속하면, DynamoDB에 저장된 과거의 채팅이력을 조회하여 화면에 표시합니다.
@@ -663,9 +669,9 @@ ValueError: Stop sequence key name for meta is not supported.
 
 #### 기본 채팅
 
-메뉴에서 "General Conversation"을 선택하고 먼저 "나는 여행을 좋아해"라고 입력한 후에, 다시 아래처럼 "서울"이라고 입력합니다. 대화 이력을 활용하였기 때문에 "서울"이라는 질문에 서울 여행과 관련된 대화를 수행합니다.  Llama3는 아직 [multilingual을 공식적으로 지원하지 않고 있어](https://ai.meta.com/blog/meta-llama-3/), 일부 부족한 면이 있으나 어느정도 수준의 한국어를 지원하고 있습니다. 
+메뉴에서 "General Conversation"을 선택하고 먼저 "나는 여행을 좋아해"라고 입력한 후에, 다시 아래처럼 "제주"라고 입력합니다. 대화 이력을 활용하였기 때문에 "제주"이라는 질문에 제주 여행과 관련된 대화를 수행합니다.  Llama3.1는 [multilingual을 공식적으로 지원](https://scontent-ssn1-1.xx.fbcdn.net/v/t39.2365-6/452387774_1036916434819166_4173978747091533306_n.pdf?_nc_cat=104&ccb=1-7&_nc_sid=3c67a6&_nc_ohc=t6egZJ8QdI4Q7kNvgEBG6o4&_nc_ht=scontent-ssn1-1.xx&oh=00_AYBdfFc8msOH4iSUsYP_7d5LJLfxTrtJ_aV2U5elEF-Ihg&oe=66A60A8D)하여 이전 Llama3대비 훨씬 자연스러운 대화가 가능합니다.
 
-![image](https://github.com/kyopark2014/llama3-rag-workshop/assets/52392004/0dd1034d-5166-4783-b37c-9728937ace63)
+![image](https://github.com/user-attachments/assets/8d0cd216-11e8-4d79-af62-c925808584e5)
 
 
 브라우저에서 뒤로가기를 선택하여 아래와 같이 Conversation Type을 "4. Translation"로 선택합니다. 
