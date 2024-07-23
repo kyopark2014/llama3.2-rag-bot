@@ -680,7 +680,7 @@ ValueError: Stop sequence key name for meta is not supported.
 
 #### 기본 채팅
 
-메뉴에서 "General Conversation"을 선택하고 먼저 "나는 여행을 좋아해"라고 입력한 후에, 다시 아래처럼 "제주"라고 입력합니다. 대화 이력을 활용하였기 때문에 "제주"이라는 질문에 제주 여행과 관련된 대화를 수행합니다.  Llama3.1는 [multilingual을 공식적으로 지원](https://scontent-ssn1-1.xx.fbcdn.net/v/t39.2365-6/452387774_1036916434819166_4173978747091533306_n.pdf?_nc_cat=104&ccb=1-7&_nc_sid=3c67a6&_nc_ohc=t6egZJ8QdI4Q7kNvgEBG6o4&_nc_ht=scontent-ssn1-1.xx&oh=00_AYBdfFc8msOH4iSUsYP_7d5LJLfxTrtJ_aV2U5elEF-Ihg&oe=66A60A8D)하여 이전 Llama3대비 훨씬 자연스러운 대화가 가능합니다.
+메뉴에서 "General Conversation"을 선택하고 먼저 "나는 여행을 좋아해"라고 입력한 후에, 다시 아래처럼 "제주"라고 입력합니다. 대화 이력을 활용하였기 때문에 "제주"이라는 질문에 제주 여행과 관련된 대화를 수행합니다.  
 
 ![image](https://github.com/user-attachments/assets/8d0cd216-11e8-4d79-af62-c925808584e5)
 
@@ -693,6 +693,9 @@ ValueError: Stop sequence key name for meta is not supported.
 
 ![image](https://github.com/user-attachments/assets/dd1063a5-6d57-4754-9d99-21aee0d92254)
 
+반대로 영어를 한국어로 번역할 수 있는지 확인하기 위하여, "Gyeongju is a historic city in our country. It was the capital of the Silla Kingdom and has many cultural heritages. Gyeongju has various tourist attractions. Bulguksa Temple is a UNESCO World Cultural Heritage site and has many cultural assets. This place has many Buddha statues. Second, Seokguram Grotto is a UNESCO World Cultural Heritage site along with Bulguksa Temple and has many Buddha statues. Third, it is a place where you can feel Gyeongju's historical cultural heritage. This place has Anapji Pond, Cheomseongdae Observatory, and Hwangnyongsa Temple, among others. Fourth, Yangdong Folk Village is a traditional Korean village that has preserved its old appearance. Gyeongju is recommended for those interested in history because it has many historical cultural heritages. Additionally, Gyeongju's natural scenery is also beautiful. You can have various experiences by visiting Gyeongju."로 입력시 아래와 같이 한국어 답변을 제공하지 않고 있습니다. Llama3.1는 [multilingual을 지원](https://scontent-ssn1-1.xx.fbcdn.net/v/t39.2365-6/452387774_1036916434819166_4173978747091533306_n.pdf?_nc_cat=104&ccb=1-7&_nc_sid=3c67a6&_nc_ohc=t6egZJ8QdI4Q7kNvgEBG6o4&_nc_ht=scontent-ssn1-1.xx&oh=00_AYBdfFc8msOH4iSUsYP_7d5LJLfxTrtJ_aV2U5elEF-Ihg&oe=66A60A8D)하지만, 한국어를 지원하지 않습니다. 
+
+![image](https://github.com/user-attachments/assets/64b90561-5400-4184-9ed9-0971d8926538)
 
 메뉴에서 "5. Grammatical Error Correction"을 선택합니다. 이후 "Gyeongju are a historic city in our country. It were the capital of the Silla Kingdom and have many cultural heritages."로 입력후 결과를 확인합니다. 아래와 같이 잘못된 문법과 수정된 내용을 보여줍니다.
 
