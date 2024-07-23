@@ -21,7 +21,7 @@
 ## Llama3 RAG 구현 
 
 
-### LangChain을 이용한 Bedrock 설정
+### LangChain을 이용한 Llama3.1 설정
 
 LangChain의 [ChatBedrock](https://python.langchain.com/v0.2/docs/integrations/chat/bedrock/)로 API을 이용합니다.
 
@@ -46,6 +46,18 @@ chat = ChatBedrock(
     client=boto3_bedrock, 
     model_kwargs=parameters,
 )
+```
+
+Llama3.1에 대한 모델 정보는 아래와 같습니다.
+
+```java
+const llama3 = [
+  {
+    "bedrock_region": "us-west-2", // Oregon
+    "model_type": "llama3",
+    "model_id": "meta.llama3-1-70b-instruct-v1:0"
+  }
+];
 ```
 
 ### Basic Chat
