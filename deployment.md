@@ -45,7 +45,7 @@ git clone https://github.com/kyopark2014/llama3-rag-workshop
 5) cdk 폴더로 이동하여 필요한 라이브러리를 설치합니다.
 
 ```java
-cd llama3-rag-workshop/cdk-llama3-rag-workshop/ && npm install
+cd llama3.1-rag-bot/cdk-llama3-rag-workshop/ && npm install
 ```
 
 6) CDK 사용을 위해 Bootstraping을 수행합니다.
@@ -84,7 +84,7 @@ cdk deploy --all
 
 9) Hybrid 검색을 위한 Nori Plug-in 설치
 
-[OpenSearch Console](https://us-west-2.console.aws.amazon.com/aos/home?region=us-west-2#opensearch/domains)에서 "llama3-rag-workshop"로 들어가서 [Packages] - [Associate package]을 선택한 후에, 아래와 같이 "analysis-nori"을 설치합니다. 
+[OpenSearch Console](https://us-west-2.console.aws.amazon.com/aos/home?region=us-west-2#opensearch/domains)에서 "llama3.1-rag-bot"로 들어가서 [Packages] - [Associate package]을 선택한 후에, 아래와 같이 "analysis-nori"을 설치합니다. 
 
 ![image](https://github.com/kyopark2014/korean-chatbot-using-amazon-bedrock/assets/52392004/b91c91a1-b13c-4f5d-bd58-1c8298b2f128)
 
