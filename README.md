@@ -723,7 +723,7 @@ ValueError: Stop sequence key name for meta is not supported.
 2) [Cloud9 console](https://us-west-2.console.aws.amazon.com/cloud9control/home?region=us-west-2#/)에 접속하여 아래의 명령어로 전체 삭제를 합니다.
 
 ```text
-cd ~/environment/llama3-rag-workshop/cdk-llama3-rag-workshop/ && cdk destroy --all
+cd ~/environment/llama3.1-rag-bot/cdk-llama3-rag-workshop/ && cdk destroy --all
 ```
 
 
