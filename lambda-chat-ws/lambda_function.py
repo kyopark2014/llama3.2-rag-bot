@@ -384,6 +384,56 @@ def translate_text(chat, text):
     
     return msg[msg.find('<result>')+8:len(msg)-9] # remove <result> tag
 
+def translate_text_temparary(chat, text):
+    global time_for_inference
+    
+    if debugMessageMode == 'true':  
+        start_time_for_inference = time.time()
+    
+    if isKorean(text)==True:        
+        system = (
+            "You are a helpful assistant that translates Korean to English in <article> tags. Put it in <result> tags."
+        )
+    else:
+        system = (
+            "다음의 <article> tags의 내용을 한국어로 번역하세요. 결과는 <result> tag를 붙여주세요."
+        )
+        
+    human = "<article>{text}</article>"
+    
+    prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human)])
+    print('prompt: ', prompt)
+    
+    if isKorean(text)==False :
+        input_language = "English"
+        output_language = "Korean"
+    else:
+        input_language = "Korean"
+        output_language = "English"
+                        
+    chain = prompt | chat    
+    try: 
+        result = chain.invoke(
+            {
+                "input_language": input_language,
+                "output_language": output_language,
+                "text": text,
+            }
+        )
+        
+        msg = result.content
+        print('translated text: ', msg)
+    except Exception:
+        err_msg = traceback.format_exc()
+        print('error message: ', err_msg)                    
+        raise Exception ("Not able to request to LLM")
+
+    if debugMessageMode == 'true':          
+        end_time_for_inference = time.time()
+        time_for_inference = end_time_for_inference - start_time_for_inference
+    
+    return msg[msg.find('<result>')+8:len(msg)-9] # remove <result> tag
+
 def check_grammer(chat, text):
     global time_for_inference
     
@@ -1813,7 +1863,8 @@ def getResponse(connectionId, jsonBody):
                     msg, reference = get_answer_using_RAG(chat, text, search_type, connectionId, requestId, bedrock_embedding)
                         
                 elif conv_type == 'translation':                    
-                    msg = translate_text(chat, text)
+                    # msg = translate_text(chat, text)
+                    msg = translate_text_temparary(chat, text)
                 
                 elif conv_type == 'grammar':                    
                     msg = check_grammer(chat, text)
