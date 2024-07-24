@@ -18,6 +18,8 @@
 
 ![llama3 1](https://github.com/user-attachments/assets/9abf01bf-f044-4bbf-b825-d73035a78287)
 
+Supported languages for Llama 3.1: English, French, German, Hindi, Italian, Portuguese, Spanish, Thai (July 24)
+
 ## Llama3 RAG 구현 
 
 
