@@ -18,7 +18,7 @@
 
 ![llama3 1](https://github.com/user-attachments/assets/9abf01bf-f044-4bbf-b825-d73035a78287)
 
-Supported languages for Llama 3.1: English, French, German, Hindi, Italian, Portuguese, Spanish, Thai (July 24)
+Supported languages for Llama 3.1: English, French, German, Hindi, Italian, Portuguese, Spanish, Thai (July 24).
 Llama3.1는 [multilingual을 지원](https://scontent-ssn1-1.xx.fbcdn.net/v/t39.2365-6/452387774_1036916434819166_4173978747091533306_n.pdf?_nc_cat=104&ccb=1-7&_nc_sid=3c67a6&_nc_ohc=t6egZJ8QdI4Q7kNvgEBG6o4&_nc_ht=scontent-ssn1-1.xx&oh=00_AYBdfFc8msOH4iSUsYP_7d5LJLfxTrtJ_aV2U5elEF-Ihg&oe=66A60A8D)합니다.
 
 ## Llama3 RAG 구현 
