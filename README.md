@@ -19,6 +19,7 @@
 ![llama3 1](https://github.com/user-attachments/assets/9abf01bf-f044-4bbf-b825-d73035a78287)
 
 Supported languages for Llama 3.1: English, French, German, Hindi, Italian, Portuguese, Spanish, Thai (July 24)
+Llama3.1는 [multilingual을 지원](https://scontent-ssn1-1.xx.fbcdn.net/v/t39.2365-6/452387774_1036916434819166_4173978747091533306_n.pdf?_nc_cat=104&ccb=1-7&_nc_sid=3c67a6&_nc_ohc=t6egZJ8QdI4Q7kNvgEBG6o4&_nc_ht=scontent-ssn1-1.xx&oh=00_AYBdfFc8msOH4iSUsYP_7d5LJLfxTrtJ_aV2U5elEF-Ihg&oe=66A60A8D)합니다.
 
 ## Llama3 RAG 구현 
 
@@ -268,35 +269,36 @@ def lambda_handler(event, context):
 Prompt Engineering을 이용하여 손쉽게 한/영 번역을 수행합니다.
 
 ```python
-def translate_text(chat, text):
-    system = (
-        "You are a helpful assistant that translates {input_language} to 
-         {output_language} in <article> tags. Put it in <result> tags."
-    )
+def translate_text(chat, text):    
+    if isKorean(text)==True:        
+        system = (
+            "You are a helpful assistant that translates Korean to English in <article> tags. Put it in <result> tags."
+        )
+    else:
+        system = (
+            "다음의 <article> tags의 내용을 한국어로 번역하세요. 결과는 <result> tag를 붙여주세요."
+        )
+        
     human = "<article>{text}</article>"
     
     prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human)])
+    print('prompt: ', prompt)
     
-    if isKorean(text)==False :
-        input_language = "English"
-        output_language = "Korean"
-    else:
-        input_language = "Korean"
-        output_language = "English"
-```
-
-Input/output 언어 타입과 입력 텍스트를 지정 후 chain.invoke()를 이용합니다.
-
-```python
     chain = prompt | chat    
-    result = chain.invoke(
-        {
-            "input_language": input_language,
-            "output_language": output_language,
-            "text": text,
-        }
-    )
+    try: 
+        result = chain.invoke(
+            {
+                "text": text
+            }
+        )
         
+        msg = result.content
+        print('translated text: ', msg)
+    except Exception:
+        err_msg = traceback.format_exc()
+        print('error message: ', err_msg)                    
+        raise Exception ("Not able to request to LLM")
+
     msg = result.content
     return msg[msg.find('<result>')+8:len(msg)-9] # remove <result> tag
 ```
@@ -695,11 +697,7 @@ ValueError: Stop sequence key name for meta is not supported.
 
 ![image](https://github.com/user-attachments/assets/dd1063a5-6d57-4754-9d99-21aee0d92254)
 
-반대로 영어를 한국어로 번역할 수 있는지 확인하기 위하여, "Gyeongju is a historic city in our country. It was the capital of the Silla Kingdom and has many cultural heritages. Gyeongju has various tourist attractions. Bulguksa Temple is a UNESCO World Cultural Heritage site and has many cultural assets. This place has many Buddha statues. Second, Seokguram Grotto is a UNESCO World Cultural Heritage site along with Bulguksa Temple and has many Buddha statues. Third, it is a place where you can feel Gyeongju's historical cultural heritage. This place has Anapji Pond, Cheomseongdae Observatory, and Hwangnyongsa Temple, among others. Fourth, Yangdong Folk Village is a traditional Korean village that has preserved its old appearance. Gyeongju is recommended for those interested in history because it has many historical cultural heritages. Additionally, Gyeongju's natural scenery is also beautiful. You can have various experiences by visiting Gyeongju."로 입력시 아래와 같이 한국어 답변을 제공하지 않고 있습니다. Llama3.1는 [multilingual을 지원](https://scontent-ssn1-1.xx.fbcdn.net/v/t39.2365-6/452387774_1036916434819166_4173978747091533306_n.pdf?_nc_cat=104&ccb=1-7&_nc_sid=3c67a6&_nc_ohc=t6egZJ8QdI4Q7kNvgEBG6o4&_nc_ht=scontent-ssn1-1.xx&oh=00_AYBdfFc8msOH4iSUsYP_7d5LJLfxTrtJ_aV2U5elEF-Ihg&oe=66A60A8D)하지만, 한국어를 지원하지 않습니다. 
-
-![image](https://github.com/user-attachments/assets/64b90561-5400-4184-9ed9-0971d8926538)
-
-Prompt를 변경하여 명시적으로 한국어로 답변하도록 하니 아래와 같이 결국 번역은 성공하였습니다.
+반대로 영어를 한국어로 번역할 수 있는지 확인하기 위하여, "Gyeongju is a historic city in our country. It was the capital of the Silla Kingdom and has many cultural heritages. Gyeongju has various tourist attractions. Bulguksa Temple is a UNESCO World Cultural Heritage site and has many cultural assets. This place has many Buddha statues. Second, Seokguram Grotto is a UNESCO World Cultural Heritage site along with Bulguksa Temple and has many Buddha statues. Third, it is a place where you can feel Gyeongju's historical cultural heritage. This place has Anapji Pond, Cheomseongdae Observatory, and Hwangnyongsa Temple, among others. Fourth, Yangdong Folk Village is a traditional Korean village that has preserved its old appearance. Gyeongju is recommended for those interested in history because it has many historical cultural heritages. Additionally, Gyeongju's natural scenery is also beautiful. You can have various experiences by visiting Gyeongju."로 입력합니다. 
 
 <img width="876" alt="image" src="https://github.com/user-attachments/assets/7a0bf9b5-0a11-41ed-ba9e-36b965bdd058">
 
