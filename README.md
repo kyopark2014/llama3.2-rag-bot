@@ -699,6 +699,12 @@ ValueError: Stop sequence key name for meta is not supported.
 
 ![image](https://github.com/user-attachments/assets/64b90561-5400-4184-9ed9-0971d8926538)
 
+Prompt를 변경하여 명시적으로 한국어로 답변하도록 하니 아래와 같이 결국 번역은 성공하였습니다.
+
+<img width="876" alt="image" src="https://github.com/user-attachments/assets/7a0bf9b5-0a11-41ed-ba9e-36b965bdd058">
+
+
+
 메뉴에서 "5. Grammatical Error Correction"을 선택합니다. 이후 "Gyeongju are a historic city in our country. It were the capital of the Silla Kingdom and have many cultural heritages."로 입력후 결과를 확인합니다. 아래와 같이 잘못된 문법과 수정된 내용을 보여줍니다.
 
 ![image](https://github.com/kyopark2014/llama3-rag-workshop/assets/52392004/9b22c400-5776-4ed5-b1cb-c551338fe053)
