@@ -404,20 +404,11 @@ def translate_text_temparary(chat, text):
     prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human)])
     print('prompt: ', prompt)
     
-    if isKorean(text)==False :
-        input_language = "English"
-        output_language = "Korean"
-    else:
-        input_language = "Korean"
-        output_language = "English"
-                        
     chain = prompt | chat    
     try: 
         result = chain.invoke(
             {
-                "input_language": input_language,
-                "output_language": output_language,
-                "text": text,
+                "text": text
             }
         )
         
