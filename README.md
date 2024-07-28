@@ -51,14 +51,14 @@ chat = ChatBedrock(
 )
 ```
 
-Llama3.1에 대한 모델 정보는 아래와 같습니다.
+Llama3.1에 대한 모델 정보는 아래와 같습니다. 여기서 Llama3.1의 405B의 모델명은 "meta.llama3-1-405b-instruct-v1:0"이고, 70B는 "meta.llama3-1-70b-instruct-v1:0" 입니다. 
 
 ```java
 const llama3 = [
   {
     "bedrock_region": "us-west-2", // Oregon
     "model_type": "llama3",
-    "model_id": "meta.llama3-1-70b-instruct-v1:0"
+    "model_id": "meta.llama3-1-405b-instruct-v1:0" // "meta.llama3-1-70b-instruct-v1:0"
   }
 ];
 ```
