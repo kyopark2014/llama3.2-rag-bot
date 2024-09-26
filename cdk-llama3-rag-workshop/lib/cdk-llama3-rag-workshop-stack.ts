@@ -45,7 +45,8 @@ const llama3 = [
   {
     "bedrock_region": "us-west-2", // Oregon
     "model_type": "llama3",
-    "model_id": "meta.llama3-2-90b-instruct-v1:0"
+    // "model_id": "meta.llama3-2-90b-instruct-v1:0" on-demend
+    "model_id": "us.meta.llama3-2-90b-instruct-v1:0"  // cross-region inference
   }
 ];
 
