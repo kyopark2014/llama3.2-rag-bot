@@ -2,7 +2,8 @@ Updating....
 
 Llama3.2로 업그레이드 중입니다...
 
-"botocore.errorfactory.ValidationException: An error occurred (ValidationException) when calling the InvokeModel operation: The provided model doesn't support on-demand throughput."
+raise NotImplementedError(
+NotImplementedError: Provider us model does not support chat.
 
 # Llama3.2로 RAG를 구현하기 
 
