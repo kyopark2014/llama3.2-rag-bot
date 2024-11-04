@@ -18,7 +18,7 @@
 
 ## Llama3 RAG 구현 
 
-### LangChain을 이용한 Llama3.1 설정
+### LangChain 설정
 
 LangChain의 [ChatBedrock](https://python.langchain.com/v0.2/docs/integrations/chat/bedrock/)로 API을 이용합니다.
 
