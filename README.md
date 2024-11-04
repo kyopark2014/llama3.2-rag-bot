@@ -4,7 +4,7 @@
 <img alt="License" src="https://img.shields.io/badge/LICENSE-MIT-green">
 
 
-여기에서는 Llama3.1를 이용해 RAG를 구현하는 과정을 설명합니다. 여기에서는 Advanced RAG에서 성능 향상을 위해 활용되는 parent/child chunking, lexical/semantic 검색등이 포함되어 있습니다. 전체적인 Architecture는 아래와 같습니다.
+여기에서는 Llama3.2를 이용해 RAG를 구현하는 과정을 설명합니다. 여기에서는 Advanced RAG에서 성능 향상을 위해 활용되는 parent/child chunking, lexical/semantic 검색등이 포함되어 있습니다. 전체적인 Architecture는 아래와 같습니다.
 
 1) 브라우저를 이용하여 CloudFront의 Domain로 접속하면 S3에 있는 html, css, js를 이용해 채팅화면 UI를 구성합니다.
 2) 사용자가 userId를 넣고 접속하면, DynamoDB에 저장된 과거의 채팅이력을 조회하여 화면에 표시합니다.
@@ -16,17 +16,7 @@
 
 <img src="./images/basic-architecture.png" width="800">
 
-## Llama3.1 
-
-[Llama3.1 paper](https://scontent-ssn1-1.xx.fbcdn.net/v/t39.2365-6/452387774_1036916434819166_4173978747091533306_n.pdf?_nc_cat=104&ccb=1-7&_nc_sid=3c67a6&_nc_ohc=t6egZJ8QdI4Q7kNvgEBG6o4&_nc_ht=scontent-ssn1-1.xx&oh=00_AYBdfFc8msOH4iSUsYP_7d5LJLfxTrtJ_aV2U5elEF-Ihg&oe=66A60A8D)와 같이 다양한 업그레이드가 있었습니다. 
-
-![llama3 1](https://github.com/user-attachments/assets/9abf01bf-f044-4bbf-b825-d73035a78287)
-
-Supported languages for Llama 3.1: English, French, German, Hindi, Italian, Portuguese, Spanish, Thai (July 24).
-Llama3.1는 [multilingual을 지원](https://scontent-ssn1-1.xx.fbcdn.net/v/t39.2365-6/452387774_1036916434819166_4173978747091533306_n.pdf?_nc_cat=104&ccb=1-7&_nc_sid=3c67a6&_nc_ohc=t6egZJ8QdI4Q7kNvgEBG6o4&_nc_ht=scontent-ssn1-1.xx&oh=00_AYBdfFc8msOH4iSUsYP_7d5LJLfxTrtJ_aV2U5elEF-Ihg&oe=66A60A8D)합니다.
-
 ## Llama3 RAG 구현 
-
 
 ### LangChain을 이용한 Llama3.1 설정
 
